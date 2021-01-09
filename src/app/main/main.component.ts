@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+// import { Observable } from 'rxjs';
 import { WservService } from '../service/wserv.service';
+import { Observable, of, throwError } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-main',
@@ -9,16 +11,13 @@ import { WservService } from '../service/wserv.service';
   styleUrls: ['./main.component.scss']
 })
 export class MainComponent implements OnInit {
-  url: string;
-  lat: number = 55;
-  lon: number = 66;
-  currentCity$: Observable<string>;
-  weatherData$: Observable<any>;
-  imgUrl = '';
-  constructor(private http: HttpClient, private wServ: WservService) {
-    // this.url = `https://api.openweathermap.org/data/2.5/onecall?lat=${this.lat}&lon=${this.lon}&appid=884d81e08928897eb9732f0ffb3a3dbd`
-
-  }
+  lat: number;
+  lon: number;
+  currentCity: string;
+  weatherData: any;
+  displayBlock = true;
+  iterations = [0, 1, 2, 3, 4]
+  constructor(private wServ: WservService) { }
 
   ngOnInit(): void {
     this.findCoords()
@@ -30,28 +29,80 @@ export class MainComponent implements OnInit {
         console.log(position);
         this.lat = position.coords.latitude;
         this.lon = position.coords.longitude;
-        this.currentCity$ = this.http.get<any>(`https://geocode.xyz/${this.lat},${this.lon}?json=1&auth=290629103372115107625x125300`)
-        this.getCityData();
-        // console.log(new Date().getTime())
+        this.wServ.getCityNameByCoords(this.lat, this.lon).subscribe(d => {
+          this.currentCity = d.city
+          console.log('City data', d)
+        }
+        )
+        this.getWeatherData(this.lat, this.lon);
       })
     }
     else console.log('does not supports')
+  }
+
+  getNewCityWeather() {
+    // console.log(this.currentCity)
+
+    this.wServ.getLocationDataByCity(this.currentCity).subscribe(d => {
+      this.currentCity = d.standard.city
+      console.log('Location data', d)
+      this.lat = d.latt
+      this.lon = d.longt
+      this.getWeatherData(this.lat, this.lon)
+    })
+  }
+
+
+  getWeatherData(lat, lon) {
+    this.displayBlock = false;
+    this.wServ.getWeatherData(lat, lon)
+      // .pipe(catchError(err=>{  
+      //     alert('There is no such city')
+      //                 console.log('ghghghf',err); 
+      //                 return throwError(err);
+      //             })
+      // )
+      .subscribe(d => {
+        this.weatherData = d;
+        this.displayBlock = true;
+        console.log('Weather data', this.weatherData)
+      },
+        error => { console.log('jgjh', error); alert('There is no such city') }
+      )
+    // catchError(err => {  
+    //   alert('There is no such city')
+    //               console.log('ghghghf',err); 
+    //               return throwError(err);
+    //           })
 
   }
 
-  getWeatherData() {
-    this.weatherData$ = this.http.get<any>(this.url);
-    this.wServ.getWeatherData(2,2).subscribe(d =>
-      console.log('Weather data', d))
+  clear() {
+    this.currentCity = '';
+    this.displayBlock = false;
   }
 
-  getCityData() {
-    this.wServ.getCityData(2,2).subscribe(d => {
-      console.log('City data', d)
-      this.url = 'https://api.openweathermap.org/data/2.5/weather?q=London&APPID=884d81e08928897eb9732f0ffb3a3dbd'
-      this.getWeatherData();
-      }
-    )
+  getDay() {
+
+  }
+
+  readableDate(time) {
+    var d = new Date(time*1000);
+    let dd = d.getDate();
+    let mm = +d.getMonth() + 1;
+    let yy = d.getFullYear();
+    let hh = d.getHours();
+    let mmn = d.getMinutes();
+    if (dd >= 0 && dd < 10) {
+      // return dd + "/" + mm + "/" + yy + " " + hh + ":0" + mmn;
+      return "0" + dd + "." + mm
+    }
+    else if (mm >= 0 && mm < 10) {
+      // return dd + "/" + mm + "/" + yy + " " + hh + ":" + mmn;
+      return dd + "." +"0" + mm
+    }
+    else return dd + "." + mm
+
   }
 
 

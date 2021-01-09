@@ -7,7 +7,45 @@
 <!-- </div> -->
 
 <!-- for second url -->
+<br>
+<div class="container-fluid">
+    <form>
+        <div class="container-fluid row">
+            <input class="form-control m-2 col-4" type="text" value="currentCity" [(ngModel)]="currentCity"
+                name="currentCity" placeholder="enter city">
+            <span (click)="clear()">x</span>
+            <button class="btn btn-secondary m-2" (click)="getNewCityWeather()">display wether</button>
+        </div>
+    </form>
+    <br>
+    <div *ngIf="displayBlock" class="container-fluid bg-light mb-4">
+        <h4>{{currentCity}}</h4>
+        <p>Now</p>
+        <!-- <p>{{weatherData?.current.dt*1000 | date:'shortTime'}}</p> -->
+        <img style="width: 50px; height: 50px;" [src]="weatherData?.current.weather[0].icon | urlPipe" alt="">
+        <p>{{weatherData?.current.weather[0].description}}</p>
+        <h5>{{weatherData?.current.temp | temperature}} <sup>o</sup>C</h5>
+        <div style="background-color: lightblue; padding: 5px;">Details
+            <p>Humidity: {{weatherData?.current.humidity}} %</p>
+            <p>Wind speed: {{weatherData?.current.wind_speed}} m/s</p>
+            <p>Pressure: {{weatherData?.current.pressure}} hPa</p>
+        </div>
 
-<p>{{(weatherData$ | async)?.name}}</p>
-<p>{{(weatherData$ | async)?.main.temp | temperature}}</p>
-<p>current city: {{(currentCity$ | async)?.city}}</p>
+    </div>
+
+    <div>
+        <tabset>
+            <tab *ngFor="let d of weatherData?.daily , let i=index" [heading]="readableDate(d.dt)" id="tab1">     
+                <div class="container-fluid mt-2">
+                    <img style="width: 50px; height: 50px;" [src]="d?.weather[0].icon | urlPipe" alt="">
+                    <p>{{d?.weather[0].description}}</p>
+                    <!-- <p>{{d?.weather[0].main}}</p> -->
+                    <p>{{d?.temp.max | temperature}}</p>
+                    <p>{{d?.temp.min | temperature}}</p>
+                    <!-- <p>{{d?.snow}}</p> -->
+                </div>
+            </tab> 
+        </tabset>
+    </div>
+
+</div>

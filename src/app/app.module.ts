@@ -8,6 +8,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { UrlPipePipe } from './pipes/url-pipe.pipe';
 import { TemperaturePipe } from './pipes/temperature.pipe';
+import { TabsModule } from 'ngx-bootstrap/tabs';
 
 
 @NgModule({
@@ -21,7 +22,8 @@ import { TemperaturePipe } from './pipes/temperature.pipe';
     BrowserModule,
     AppRoutingModule,
     FormsModule,
-    HttpClientModule
+    HttpClientModule,
+    TabsModule.forRoot()
   ],
   providers: [],
   bootstrap: [AppComponent]
