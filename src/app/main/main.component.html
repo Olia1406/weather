@@ -1,0 +1,13 @@
+<!-- for first url -->
+
+<!-- <div *ngFor="let d of (weatherData$ | async)?.daily">
+<p>{{d.dt }}</p>
+<p>{{d.weather[0].description}}</p>
+<img style="width: 50px; height: 50px;" [src]="d.weather[0].icon | urlPipe"> -->
+<!-- </div> -->
+
+<!-- for second url -->
+
+<p>{{(weatherData$ | async)?.name}}</p>
+<p>{{(weatherData$ | async)?.main.temp | temperature}}</p>
+<p>current city: {{(currentCity$ | async)?.city}}</p>
