@@ -1,12 +1,3 @@
-<!-- for first url -->
-
-<!-- <div *ngFor="let d of (weatherData$ | async)?.daily">
-<p>{{d.dt }}</p>
-<p>{{d.weather[0].description}}</p>
-<img style="width: 50px; height: 50px;" [src]="d.weather[0].icon | urlPipe"> -->
-<!-- </div> -->
-
-<!-- for second url -->
 <br>
 <div class="container-fluid">
     <form>
@@ -18,10 +9,11 @@
         </div>
     </form>
     <br>
-    <div *ngIf="displayBlock" class="container-fluid bg-light mb-4">
-        <h4>{{currentCity}}</h4>
-        <p>Now</p>
-        <!-- <p>{{weatherData?.current.dt*1000 | date:'shortTime'}}</p> -->
+    <div class="container-fluid bg-light mb-4">
+        <!-- <div *ngIf="displayBlock" class="container-fluid bg-light mb-4"> -->
+        <h4>{{currentCityStatic}}</h4>
+        <!-- <p>Now</p> -->
+        <p>{{weatherData?.current.dt*1000 | date:'shortTime'}}</p>
         <img style="width: 50px; height: 50px;" [src]="weatherData?.current.weather[0].icon | urlPipe" alt="">
         <p>{{weatherData?.current.weather[0].description}}</p>
         <h5>{{weatherData?.current.temp | temperature}} <sup>o</sup>C</h5>

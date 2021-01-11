@@ -1,9 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-// import { Observable } from 'rxjs';
 import { WservService } from '../service/wserv.service';
-import { Observable, of, throwError } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-main',
@@ -14,95 +10,116 @@ export class MainComponent implements OnInit {
   lat: number;
   lon: number;
   currentCity: string;
+  currentCityStatic: string;
+  initiasCoordsData: any;
   weatherData: any;
-  displayBlock = true;
-  iterations = [0, 1, 2, 3, 4]
+  geoApiCalls = 1;
   constructor(private wServ: WservService) { }
 
   ngOnInit(): void {
-    this.findCoords()
+    this.findCoords();
   }
-
-  findCoords() {
+// get weather data and city name using local coords
+  findCoords():void {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(position => {
         console.log(position);
         this.lat = position.coords.latitude;
         this.lon = position.coords.longitude;
+        let key: string = this.lat.toString() + this.lon.toString();
+        // if (localStorage.getItem(`${key}`)) {
+        //   this.initiasCoordsData = JSON.parse(localStorage.getItem(`${key}`))
+        //   this.currentCity = this.initiasCoordsData.city
+        //   this.currentCityStatic = this.initiasCoordsData.city
+        //   console.log('City data', this.initiasCoordsData)
+        // }
+        // else {
+        // get weather data
+        this.getWeatherData(this.lat, this.lon);
+        // and get city name at the same time
         this.wServ.getCityNameByCoords(this.lat, this.lon).subscribe(d => {
           this.currentCity = d.city
+          this.currentCityStatic = d.city
+          // localStorage.setItem(`${key}`, JSON.stringify(d))
+          setTimeout(() => {
+            localStorage.removeItem(`${key}`)
+          }, 60000)
+          this.geoApiCalls = d.remaining_credits
+          console.log('Geoloation API calls', this.geoApiCalls)
           console.log('City data', d)
-        }
-        )
-        this.getWeatherData(this.lat, this.lon);
+        })
+        // }
       })
     }
     else console.log('does not supports')
   }
-
+// get weather data by another city name (currentCity, - changable)
+// uses getWeatherData(), described below
   getNewCityWeather() {
-    // console.log(this.currentCity)
-
-    this.wServ.getLocationDataByCity(this.currentCity).subscribe(d => {
-      this.currentCity = d.standard.city
+    let keyName = this.currentCity.toLowerCase()
+    if (localStorage.getItem(`${keyName}`)) {
+      let d = JSON.parse(localStorage.getItem(`${keyName}`))
+      this.currentCityStatic = d.standard.city
       console.log('Location data', d)
       this.lat = d.latt
       this.lon = d.longt
       this.getWeatherData(this.lat, this.lon)
-    })
+    }
+    else {
+      this.wServ.getLocationDataByCity(this.currentCity).subscribe(d => {
+        this.currentCityStatic = d.standard.city
+        this.lat = d.latt
+        this.lon = d.longt
+        this.getWeatherData(this.lat, this.lon)
+        localStorage.setItem(`${keyName}`, JSON.stringify(d))
+        setTimeout(() => {
+          localStorage.removeItem(`${keyName}`)
+        }, 60000)
+        this.geoApiCalls =  d.remaining_credits
+        console.log('Geoloation API calls', this.geoApiCalls)
+        console.log('Location data', d)
+      })
+    }
+
+
   }
 
-
-  getWeatherData(lat, lon) {
-    this.displayBlock = false;
-    this.wServ.getWeatherData(lat, lon)
-      // .pipe(catchError(err=>{  
-      //     alert('There is no such city')
-      //                 console.log('ghghghf',err); 
-      //                 return throwError(err);
-      //             })
-      // )
-      .subscribe(d => {
-        this.weatherData = d;
-        this.displayBlock = true;
-        console.log('Weather data', this.weatherData)
-      },
-        error => { console.log('jgjh', error); alert('There is no such city') }
-      )
-    // catchError(err => {  
-    //   alert('There is no such city')
-    //               console.log('ghghghf',err); 
-    //               return throwError(err);
-    //           })
+  getWeatherData(lat: number, lon: number): void {
+    let k: string = lat.toString() + lon.toString();
+    if (localStorage.getItem(`${k}`)) {
+      this.weatherData = JSON.parse(localStorage.getItem(`${k}`))
+    }
+    else {
+      this.wServ.getWeatherData(lat, lon)
+        .subscribe(d => {
+          this.weatherData = d;
+          localStorage.setItem(`${k}`, JSON.stringify(this.weatherData))
+          setTimeout(() => {
+            localStorage.removeItem(`${k}`)
+          }, 60000)
+          console.log('Weather data', this.weatherData)
+        },
+          error => { console.log('error', error); alert('There is no such city') }
+        )
+    }
 
   }
 
   clear() {
     this.currentCity = '';
-    this.displayBlock = false;
-  }
-
-  getDay() {
-
   }
 
   readableDate(time) {
-    var d = new Date(time*1000);
+    let d = new Date(time * 1000);
     let dd = d.getDate();
     let mm = +d.getMonth() + 1;
-    let yy = d.getFullYear();
-    let hh = d.getHours();
-    let mmn = d.getMinutes();
     if (dd >= 0 && dd < 10) {
-      // return dd + "/" + mm + "/" + yy + " " + hh + ":0" + mmn;
       return "0" + dd + "." + mm
     }
     else if (mm >= 0 && mm < 10) {
-      // return dd + "/" + mm + "/" + yy + " " + hh + ":" + mmn;
-      return dd + "." +"0" + mm
+      return dd + "." + "0" + mm
     }
     else return dd + "." + mm
-
   }
 
 
