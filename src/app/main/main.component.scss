@@ -1,9 +1,112 @@
-p{
-    // line-height: 10px;
+$secondColorLt: #495662;
+@mixin flexbox($d, $w, $jc, $ai) {
+    display: flex;
+    flex-flow: $d $w;
+    justify-content: $jc;
+    align-items: $ai;
 }
-span{
-    position: relative;
-    top:13px;
-    left: -25px;
-    color: gray;
+@font-face{
+    font-family: 'Monserrat-medium';
+    src: url(../../assets/fonts/Montserrat-Medium.ttf);
+}
+@font-face{
+    font-family: 'Montserrat-SemiBold';
+    src: url(../../assets/fonts/Montserrat-SemiBold.ttf);
+}
+.header{
+    @include flexbox(row, wrap, space-around, center);
+    background-color: rgb(88, 185, 218);
+}
+.weather-image{
+    img{
+        width: 35vw;
+        height: 22vw;
+    }
+}
+.title-container{
+    h1{
+        font-family: 'Montserrat-SemiBold';
+        color: white;
+        text-shadow: 8px 6px 5px rgba(0,0,0,0.2);
+    }
+    width: 450px;
+    min-height: 120px;
+    @include flexbox(column, wrap, center, center);
+    span{
+        position: relative;
+        top:13px;
+        left: -25px;
+        color: gray;
+        &:hover{
+            color: rgb(63, 62, 62);
+            font-weight: 400;
+        }
+    }
+}
+.local-wether-container{
+    @include flexbox(row, wrap, center, center);
+    background-color: rgb(88, 185, 218);
+    min-height: 300px;
+}
+.line{
+    border: 1px solid rgb(36, 126, 199);
+    width: 100%;
+    margin-bottom: 20px;
+}     
+.main-info,.info-details{
+    color: $secondColorLt;
+    color: rgb(31, 102, 160);
+    font-family: sans-serif;
+    padding: 20px;
+    margin: 15px;
+    @include flexbox(column, wrap, flex-start, flex-start);
+    width: 40vw;
+    height: 310px;
+    background-color: rgb(229, 240, 247);
+    border: 1px solid rgb(221, 220, 220);
+    border-radius: 8px;
+    h4{
+        color: rgb(36, 126, 199);
+    }
+    span{
+        line-height: 26px;
+    }
+}
+.separator1{
+    height: 10px;
+    background-color: white;
+}
+.daily-forecast-title,.daily-forecast-footer{
+    height: 50px;
+    line-height: 50px;
+    background-color:  rgb(200, 225, 241);
+    color:rgb(36, 126, 199);
+    font-family: 'Monserrat-medium';
+    font-size: 30px;
+    text-align: center;
+}
+
+.daily-weather-container{
+    margin-top: 10px;
+    @include flexbox(row, wrap, center, center);
+    min-height: 300px;
+}
+
+@media screen and (max-width:570px){
+    .title-container{
+      h1{
+        font-size: 35px;
+      }
+    }
+    .main-info,.info-details{
+      width: 80vw;
+    }
+    .daily-forecast-title{
+      font-size: 20px;
+    }
+}
+@media screen and (max-width:320px){
+    .daily-forecast-title{
+        font-size: 16px;
+        }
 }

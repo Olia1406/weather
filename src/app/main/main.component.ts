@@ -10,7 +10,7 @@ export class MainComponent implements OnInit {
   lat: number;
   lon: number;
   currentCity: string;
-  currentCityStatic: string;
+  currentCityStatic: string = 'your city';
   initiasCoordsData: any;
   weatherData: any;
   geoApiCalls = 1;
@@ -27,28 +27,21 @@ export class MainComponent implements OnInit {
         this.lat = position.coords.latitude;
         this.lon = position.coords.longitude;
         let key: string = this.lat.toString() + this.lon.toString();
-        // if (localStorage.getItem(`${key}`)) {
-        //   this.initiasCoordsData = JSON.parse(localStorage.getItem(`${key}`))
-        //   this.currentCity = this.initiasCoordsData.city
-        //   this.currentCityStatic = this.initiasCoordsData.city
-        //   console.log('City data', this.initiasCoordsData)
-        // }
-        // else {
         // get weather data
         this.getWeatherData(this.lat, this.lon);
         // and get city name at the same time
         this.wServ.getCityNameByCoords(this.lat, this.lon).subscribe(d => {
           this.currentCity = d.city
           this.currentCityStatic = d.city
-          // localStorage.setItem(`${key}`, JSON.stringify(d))
           setTimeout(() => {
             localStorage.removeItem(`${key}`)
           }, 60000)
           this.geoApiCalls = d.remaining_credits
           console.log('Geoloation API calls', this.geoApiCalls)
           console.log('City data', d)
-        })
-        // }
+        },
+        error => { console.log('error', error); alert('Something went wrong')}
+        )
       })
     }
     else console.log('does not supports')
@@ -78,10 +71,10 @@ export class MainComponent implements OnInit {
         this.geoApiCalls =  d.remaining_credits
         console.log('Geoloation API calls', this.geoApiCalls)
         console.log('Location data', d)
-      })
+      },
+      error => { console.log('error', error); alert('There is no such city')}
+      )
     }
-
-
   }
 
   getWeatherData(lat: number, lon: number): void {
@@ -99,7 +92,7 @@ export class MainComponent implements OnInit {
           }, 60000)
           console.log('Weather data', this.weatherData)
         },
-          error => { console.log('error', error); alert('There is no such city') }
+          error => { console.log('error', error); alert('Can not get weather data') }
         )
     }
 

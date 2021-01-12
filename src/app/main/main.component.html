@@ -1,43 +1,70 @@
-<br>
-<div class="container-fluid">
-    <form>
-        <div class="container-fluid row">
-            <input class="form-control m-2 col-4" type="text" value="currentCity" [(ngModel)]="currentCity"
-                name="currentCity" placeholder="enter city">
-            <span (click)="clear()">x</span>
-            <button class="btn btn-secondary m-2" (click)="getNewCityWeather()">display wether</button>
-        </div>
-    </form>
-    <br>
-    <div class="container-fluid bg-light mb-4">
-        <!-- <div *ngIf="displayBlock" class="container-fluid bg-light mb-4"> -->
-        <h4>{{currentCityStatic}}</h4>
-        <!-- <p>Now</p> -->
-        <p>{{weatherData?.current.dt*1000 | date:'shortTime'}}</p>
-        <img style="width: 50px; height: 50px;" [src]="weatherData?.current.weather[0].icon | urlPipe" alt="">
-        <p>{{weatherData?.current.weather[0].description}}</p>
-        <h5>{{weatherData?.current.temp | temperature}} <sup>o</sup>C</h5>
-        <div style="background-color: lightblue; padding: 5px;">Details
-            <p>Humidity: {{weatherData?.current.humidity}} %</p>
-            <p>Wind speed: {{weatherData?.current.wind_speed}} m/s</p>
-            <p>Pressure: {{weatherData?.current.pressure}} hPa</p>
-        </div>
-
+<div class="header">
+    <div class="weather-image">
+        <img src="../../assets/images/PNG-images-PNGs-Weather-Weather-forecast-Cloud--2png.png" alt="">
     </div>
-
-    <div>
-        <tabset>
-            <tab *ngFor="let d of weatherData?.daily , let i=index" [heading]="readableDate(d.dt)" id="tab1">     
-                <div class="container-fluid mt-2">
-                    <img style="width: 50px; height: 50px;" [src]="d?.weather[0].icon | urlPipe" alt="">
-                    <p>{{d?.weather[0].description}}</p>
-                    <!-- <p>{{d?.weather[0].main}}</p> -->
-                    <p>{{d?.temp.max | temperature}}</p>
-                    <p>{{d?.temp.min | temperature}}</p>
-                    <!-- <p>{{d?.snow}}</p> -->
-                </div>
-            </tab> 
-        </tabset>
+    <div class="title-container container-fluid">
+        <h1>Weather forecast</h1>
+        <form>
+            <div class="container-fluid row">
+                <input class="form-control m-2 col-7" type="text" value="currentCity" [(ngModel)]="currentCity"
+                    name="currentCity" placeholder="enter city">
+                <span (click)="clear()">x</span>
+                <button class="btn btn-secondary m-2" (click)="getNewCityWeather()">display wether</button>
+            </div>
+        </form>
     </div>
-
 </div>
+
+<div class="local-wether-container">
+    <div class="main-info">
+        <h4>In {{currentCityStatic}}</h4>
+        <div class="line"></div>
+        <h3>{{weatherData?.current.temp | temperature}} <sup>o</sup>C</h3>
+        <img style="width: 70px; height: 70px;" [src]="weatherData?.current.weather[0].icon | urlPipe" alt="">
+        <span>{{weatherData?.current.weather[0].description | titlecase}}</span>
+        <!-- <span>{{weatherData?.current.dt*1000 | date:'shortTime'}}</span> -->
+        <span>Now</span>
+    </div>
+    <div class="info-details">
+        <h4>Details</h4>
+        <div class="line"></div>
+        <span>Feels like: <b> {{weatherData?.current.feels_like | temperature}} <sup>o</sup>C</b></span>
+        <span>Humidity: <b>{{weatherData?.current.humidity}} %</b></span>
+        <span>Wind speed: <b> {{weatherData?.current.wind_speed}} m/s</b></span>
+        <span>Pressure: <b>{{weatherData?.current.pressure}} hPa</b></span>
+        <span>UV index: <b>{{weatherData?.current.uvi}} </b></span>
+        <span>Sunrise: <b>{{weatherData?.current.sunrise*1000 | date:'shortTime'}}</b></span>
+        <span>Sunset: <b>{{weatherData?.current.sunset*1000 | date:'shortTime'}}</b></span>
+    </div>
+</div>
+<div class="separator1"></div>
+<div class="daily-forecast-title">Daily forecast in {{currentCityStatic}}</div>
+<div class="daily-weather-container">
+    <tabset>
+        <tab *ngFor="let d of weatherData?.daily" [heading]="readableDate(d.dt)" id="tab1">
+            <div class="daily-weather-container">
+                <div class="main-info">
+                    <h4>{{d?.sunrise*1000 | date: 'EEEE'}}</h4>
+                    <div class="line"></div>
+                    <img style="width: 70px; height: 70px;" [src]="d?.weather[0].icon | urlPipe" alt="">
+                    <span>{{d?.weather[0].description | titlecase}}</span>
+                    <span>Max: <b>{{d?.temp.max | temperature}} <sup>o</sup>C</b></span>
+                    <span>Min: <b>{{d?.temp.min | temperature}} <sup>o</sup>C</b></span>
+                </div>
+                <div class="info-details">
+                    <h4>Details</h4>
+                    <div class="line"></div>
+                    <span>Feels like (day): <b> {{d?.feels_like.day | temperature}} <sup>o</sup>C</b></span>
+                    <span>Feels like (night): <b> {{d?.feels_like.night | temperature}} <sup>o</sup>C</b></span>
+                    <span>Humidity: <b>{{d?.humidity}} %</b></span>
+                    <span>Wind speed: <b>{{d?.wind_speed}} m/s</b></span>
+                    <span>Pressure: <b>{{d?.pressure}} hPa</b></span>
+                    <span>UV index: <b>{{d?.uvi}} </b></span>
+                    <span>Sunrise: <b>{{d?.sunrise*1000 | date:'shortTime'}}</b></span>
+                    <span>Sunset: <b>{{d?.sunset*1000 | date:'shortTime'}}</b></span>
+                </div>
+            </div>
+        </tab>
+    </tabset>
+</div>
+<div class="daily-forecast-footer"></div>
